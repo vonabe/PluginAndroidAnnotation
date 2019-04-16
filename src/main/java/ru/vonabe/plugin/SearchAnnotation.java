@@ -62,7 +62,8 @@ public class SearchAnnotation extends AnAction {
 
                     if(annotationClassName.equalsIgnoreCase(DialogViewAnnotation.class.getName())) {
                         String value = annotation.findAttribute("value").getAttributeValue().getSourceElement().getText();
-                        System.out.println("Annotation value: " + TypeDialog.valueOf(formatAnnotation(value)).name() + ", " + annotationClassName);
+                        String name = TypeDialog.valueOf(formatAnnotation(value)).name();
+
 
 //                    TypeDialog value1 = TypeDialog.valueOf();
 //                        try {
