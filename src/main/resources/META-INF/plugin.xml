@@ -1,0 +1,29 @@
+<idea-plugin>
+    <id>vonabe.plugin</id>
+    <name>Plugin Android find by Annotation save assets</name>
+    <version>0.0.1</version>
+    <vendor email="vonabe.dev@gmail.com" url="https://vk.com/leaknew">Vonabe</vendor>
+
+    <description>
+       Плагин для анализа классов с аннотациями и выводом в файл.
+    </description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.vonabe">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+        <group id="MyPlugin.SampleMenu" text="AnnotationSearch" description="Greeting menu">
+            <add-to-group group-id="MainMenu" anchor="last"></add-to-group>
+            <action class="ru.vonabe.plugin.SearchAnnotation" id="MyPlugin.Textboxes" text="Generate Mapping" description="Sasays Hello"></action>
+        </group>
+
+    </actions>
+</idea-plugin>

@@ -1,0 +1,15 @@
+plugins {
+    id 'org.jetbrains.intellij' version '0.4.7'
+}
+
+group 'vonabe'
+version '1.0-SNAPSHOT'
+
+intellij {
+    version '2018.3.5'
+}
+patchPluginXml {
+    changeNotes """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}
