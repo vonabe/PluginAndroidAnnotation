@@ -7,7 +7,18 @@ version '1.0-SNAPSHOT'
 
 intellij {
     version '2018.3.5'
+    pluginName 'AnnotationSearch'
+    plugins 'coverage'
+    updateSinceUntilBuild false
+    type 'IC'
 }
+
+publishPlugin {
+    username 'Michail'
+    password 'qwerty1'
+    channels 'nightly'
+}
+
 patchPluginXml {
     changeNotes """
       Add change notes here.<br>

@@ -1,4 +1,21 @@
 <idea-plugin>
+
+    <!--<idea-version since-build="141"></idea-version>-->
+
+    <!--<idea-version since-build="94.539"/>-->
+    <!--<idea-version since-build="162.539.11"/>-->
+    <!--<idea-version until-build="162"/> &lt;!&ndash; any build until 162, not inclusive!&ndash;&gt;-->
+    <!--<idea-version since-build="162" until-build="162.*"/> &lt;!&ndash; any 162-based version, 162.94, 162.94.11, etc.&ndash;&gt;-->
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="173.0"/>
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+       on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+    <depends>com.intellij.modules.lang</depends>
+
     <id>vonabe.plugin</id>
     <name>Plugin Android find by Annotation save assets</name>
     <version>0.0.1</version>

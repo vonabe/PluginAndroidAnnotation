@@ -1,5 +1,7 @@
 package ru.vonabe.plugin;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -14,15 +16,16 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
-@DialogViewAnnotation(value = SearchAnnotation.TypeDialog.ALERT_INFO)
 public class SearchAnnotation extends AnAction {
 
-    public static enum TypeDialog {
-        REPLACE_PHONENUMBER, REPLACE_EMAIL, REPLACE_USERNAME, ALERT_INFO, GENCODE_VERIFY
-    }
+    private String annotationSearch = "";
+    private String packagename = "";
 
     public SearchAnnotation() {
         super("Поиск аннотаций ");
@@ -36,6 +39,15 @@ public class SearchAnnotation extends AnAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
 
+        ShowDialogQueryPackagePatch showDialogQueryPackagePatch = new ShowDialogQueryPackagePatch(project);
+        showDialogQueryPackagePatch.addListener(result -> {
+            packagename = result[0];
+            annotationSearch = result[1];
+            System.out.println("Package "+packagename+" "+annotationSearch);
+        });
+        boolean b = showDialogQueryPackagePatch.showAndGet();
+        if(!b)return;
+
         VirtualFile[] children = e.getData(PlatformDataKeys.PROJECT_FILE_DIRECTORY).getChildren();
 
         StringBuilder builder = new StringBuilder();
@@ -43,41 +55,52 @@ public class SearchAnnotation extends AnAction {
             getFileIsDirectory(child);
         }
 
+        File fileData = null;
+        JsonArray array = new JsonArray();
+
         for (VirtualFile virtualFile : list) {
-            builder.append(virtualFile.getPath()).append("\n");
-
-//           FROM     C:/Users/Rik62/Desktop/VonabeAnnotationPlugin/src/main/java/ru/vonabe/plugin/SearchAnnotation.java
-//           TO       com.angrbt.lapki.dialogs.DialogCodeVerification
-
-//           FROM SearchAnnotation.TypeDialog.ALERT_INFO
-//           TO TypeDialog.ALERT_INFO
+            if(virtualFile.isDirectory()){
+                fileData = new File(virtualFile.getPath(), "mapping.json");
+            }
 
             String formatPathClass = formatClass(virtualFile.getPath());
             final PsiClass psiClass = JavaPsiFacade.getInstance(project).findClass(formatPathClass, GlobalSearchScope.allScope(project));
 
-            if(!psiClass.isAnnotationType()) {
-                PsiAnnotation[] annotations = psiClass.getAnnotations();
-                for (PsiAnnotation annotation : annotations) {
-                    String annotationClassName = annotation.getQualifiedName();
+            try {
+                if(psiClass != null) {
+                    if (!psiClass.isAnnotationType()) {
+                        PsiAnnotation[] annotations = psiClass.getAnnotations();
 
-                    if(annotationClassName.equalsIgnoreCase(DialogViewAnnotation.class.getName())) {
-                        String value = annotation.findAttribute("value").getAttributeValue().getSourceElement().getText();
-                        String name = TypeDialog.valueOf(formatAnnotation(value)).name();
+                        if(annotations.length <= 0){
+                            System.out.println(psiClass.getName()+", "+psiClass.getQualifiedName()+" annotation 0");
+                        }
 
+                        for (PsiAnnotation annotation : annotations) {
+                            String annotationClassName = annotation.getQualifiedName();
 
-//                    TypeDialog value1 = TypeDialog.valueOf();
-//                        try {
-//                            Class<?> aClass = Class.forName(annotationClassName);
-//                            DialogViewAnnotation annotation1 = aClass.getAnnotation(DialogViewAnnotation.class);
-//                            TypeDialog value1 = annotation1.value();
-//                            System.out.println("Annotation " + annotation.getQualifiedName() + " " + value1);
-//
-//                        } catch (ClassNotFoundException e1) {
-//                            e1.printStackTrace();
-//                        }
+                            if (annotationClassName.equalsIgnoreCase(annotationSearch)) {
+                                String value = annotation.findAttribute("value").getAttributeValue().getSourceElement().getText();
+                                value = formatAnnotation(value);
+//                                String name = TypeDialog.valueOf().name();
+
+                                JsonObject object = new JsonObject();
+                                object.addProperty("type", value);
+                                object.addProperty("class", psiClass.getQualifiedName());
+                                array.add(object);
+
+                                builder.append(virtualFile.getPath()).append("\n");
+
+                            } else {
+                                System.out.println(psiClass.getName()+" Don't Annotation @Dialog");
+                            }
+                        }
+                    } else {
+                        System.out.println("PsiClass isAnnotationType "+psiClass.isAnnotationType()+" "+psiClass.getName());
                     }
+                } else {
+                    System.out.println("Psi class null ");
                 }
-            } else {}
+            }catch (Exception ex){ex.printStackTrace();}
 //                Class<?> aClass1 = Class.forName(name);
 //                System.out.println("To class "+name+", "+aClass1.getCanonicalName());
 //                builder.append("To class "+name+", "+aClass1.getCanonicalName()).append("\n");
@@ -87,7 +110,14 @@ public class SearchAnnotation extends AnAction {
 //                    builder.append("TypeClass: "+value).append("\n");
 //                }
         }
-        Messages.showMessageDialog(project, builder.toString(), "Greeting", Messages.getInformationIcon());
+
+        try {
+            Files.write(fileData.toPath(), array.toString().getBytes());
+            Messages.showMessageDialog(project, builder.toString(), "Save File Success", Messages.getInformationIcon());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+
     }
 
     private String formatAnnotation(String path){
@@ -114,9 +144,13 @@ public class SearchAnnotation extends AnAction {
     public List<VirtualFile> getFileIsDirectory(VirtualFile dir){
         VfsUtilCore.iterateChildrenRecursively(dir, file -> {
             if(file.isDirectory()){
+                String path = file.getPath();
+                if(path.contains("/assets") && !list.contains(file)){
+                    list.add(file);
+                }
                 return true;
             }else{
-                if(file.getPath().contains("/ru/vonabe/plugin/") && file.getPath().endsWith(".java") && !list.contains(file)) {
+                if(file.getPath().contains(packagename) && file.getPath().endsWith(".java") && !list.contains(file)) {
                     list.add(file);
                 }
                 return false;
