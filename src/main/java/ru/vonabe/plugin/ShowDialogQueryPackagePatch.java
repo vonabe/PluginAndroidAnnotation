@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 
+
 public class ShowDialogQueryPackagePatch extends DialogWrapper {
 
     private JTextField editTextPackage = null, editTextAnnotationName = null;
@@ -41,10 +42,12 @@ public class ShowDialogQueryPackagePatch extends DialogWrapper {
         editTextPackage = new JTextField();
         editTextPackage.setPreferredSize(new Dimension(100, 30));
         editTextPackage.setToolTipText("Default Package Path");
+        editTextPackage.setText("/com/angrbt/lapki/");
 
         editTextAnnotationName = new JTextField();
         editTextAnnotationName.setPreferredSize(new Dimension(100, 30));
         editTextAnnotationName.setToolTipText("Annotation class");
+        editTextAnnotationName.setText("com.angrbt.lapki.dialogs.DialogViewAnnotation");
 
         panel.add(editTextPackage, BorderLayout.SOUTH);
         panel.add(editTextAnnotationName, BorderLayout.NORTH);

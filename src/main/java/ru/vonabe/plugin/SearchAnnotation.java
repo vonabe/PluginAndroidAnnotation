@@ -22,7 +22,15 @@ import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 
+@DialogViewAnnotation(value = SearchAnnotation.TypeDialog.ALERT_INFO)
 public class SearchAnnotation extends AnAction {
+
+    public static enum TypeDialog {
+        REPLACE_PHONENUMBER, REPLACE_EMAIL, REPLACE_USERNAME, ALERT_INFO, GENCODE_VERIFY
+    }
+
+//    /com/angrbt/lapki/  PACKAGE
+//    com.angrbt.lapki.dialogs.DialogViewAnnotation
 
     private String annotationSearch = "";
     private String packagename = "";
